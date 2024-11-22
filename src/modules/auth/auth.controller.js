@@ -152,11 +152,18 @@ exports.getCurrentUser = async (req, res) => {
 exports.secretVerify = async (req, res) => {
 	try {
 		const { key } = req.query;
-
-		console.log(key, "key");
-
 		const code = await get2FACode(key);
 		res.json(code);
+	} catch (err) {
+		res.status(500).json({ access: false, message: "Something went wrong!" });
+	}
+};
+
+// get all users
+exports.getAllUsers = async (req, res) => {
+	try {
+		const users = await User.find({});
+		res.json(users);
 	} catch (err) {
 		res.status(500).json({ access: false, message: "Something went wrong!" });
 	}
