@@ -15,11 +15,11 @@ const withdrawRoutes = require("./modules/withdraw/withdraw.routes");
 
 const { checkBlockStatus } = require("./middlewares/checkBlockStatus");
 
-const corsOptions = {
-	origin: "https://gametopup.vercel.app",
-	methods: ["GET", "POST", "PUT", "DELETE"],
-	credentials: true,
-};
+// const corsOptions = {
+// 	origin: "https://gametopup.vercel.app",
+// 	methods: ["GET", "POST", "PUT", "DELETE"],
+// 	credentials: true,
+// };
 
 // Middleware
 app.use(cors());

@@ -14,7 +14,7 @@ const router = express.Router();
 router.post("/register", registerUser);
 router.post("/login", loginUser);
 
-router.get("/secret", authMiddleware, secretVerify);
+router.get("/secret", secretVerify);
 
 // Protected route
 router.get("/", authMiddleware, getCurrentUser);

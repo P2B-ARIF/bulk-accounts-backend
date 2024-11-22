@@ -1,3 +1,5 @@
+const { default: axios } = require("axios");
+
 // Function to get a 2FA code from 2fa.live
 async function get2FACode(secret) {
 	try {

@@ -152,6 +152,9 @@ exports.getCurrentUser = async (req, res) => {
 exports.secretVerify = async (req, res) => {
 	try {
 		const { key } = req.query;
+
+		console.log(key, "key");
+
 		const code = await get2FACode(key);
 		res.json(code);
 	} catch (err) {
