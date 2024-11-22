@@ -1,6 +1,7 @@
 const bcrypt = require("bcrypt");
 const User = require("./auth.model");
 const { signToken } = require("../../utils/jwt");
+const get2FACode = require("../../utils/secretkey");
 
 // Register a new user
 exports.registerUser = async (req, res) => {
@@ -144,5 +145,16 @@ exports.getCurrentUser = async (req, res) => {
 		res
 			.status(500)
 			.json({ message: "Error fetching user", error: err.message });
+	}
+};
+
+// Get 2FA Code Route
+exports.secretVerify = async (req, res) => {
+	try {
+		const { key } = req.query;
+		const code = await get2FACode(key);
+		res.json(code);
+	} catch (err) {
+		res.status(500).json({ access: false, message: "Something went wrong!" });
 	}
 };

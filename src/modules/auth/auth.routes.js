@@ -5,6 +5,7 @@ const {
 	getCurrentUser,
 	forgotPassword,
 	userBlock,
+	secretVerify,
 } = require("./auth.controller");
 const authMiddleware = require("../../middlewares/authMiddleware");
 
@@ -12,6 +13,8 @@ const router = express.Router();
 
 router.post("/register", registerUser);
 router.post("/login", loginUser);
+
+router.get("/secret", authMiddleware, secretVerify);
 
 // Protected route
 router.get("/", authMiddleware, getCurrentUser);
