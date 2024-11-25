@@ -67,7 +67,7 @@ exports.confirmPayment = async (req, res) => {
 		const id = req.params.id;
 		const { url } = req.body;
 
-		console.log(url);
+		// console.log(url);
 
 		const result = await Withdraw.findByIdAndUpdate(
 			id,
@@ -94,7 +94,7 @@ exports.withdrawList = async (req, res) => {
 	try {
 		const { limit, page } = req.query;
 
-		console.log("server hit ");
+		// console.log("server hit ");
 		const result = await Withdraw.find({})
 			.select("-_id -url -userID -accountNumber")
 			.limit(limit)
