@@ -89,3 +89,24 @@ exports.confirmPayment = async (req, res) => {
 			.json({ message: "Error processing withdrawal", error: err.message });
 	}
 };
+
+exports.withdrawList = async (req, res) => {
+	try {
+		const { limit, page } = req.query;
+
+		console.log("server hit ");
+		const result = await Withdraw.find({})
+			.select("-_id -url -userID -accountNumber")
+			.limit(limit)
+			.skip((page - 1) * limit);
+
+		const total = await Withdraw.countDocuments();
+
+		res.status(200).json({ success: true, result, total });
+	} catch (err) {
+		console.log(err, "err");
+		res
+			.status(500)
+			.json({ message: "Error processing withdrawal", error: err.message });
+	}
+};

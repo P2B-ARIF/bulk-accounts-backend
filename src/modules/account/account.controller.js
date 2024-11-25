@@ -130,6 +130,25 @@ exports.resolvedAccount = async (req, res) => {
 	try {
 		const body = req.body;
 		const id = req.params.id;
+		const { action } = req.query;
+
+		console.log(action, "action");
+
+		dataCache.del("accounts");
+		dataCache.del("everything");
+
+		if (action === "die") {
+			const dieAccount = await Account.findByIdAndUpdate(
+				req.params.id,
+				{ die: true },
+				{ new: true },
+			);
+			return res.status(200).json({
+				success: true,
+				message: "Account die updated successfully",
+				dieAccount,
+			});
+		}
 
 		const attemptExits = await Account.findById(id, { attempt: 0 });
 
@@ -150,9 +169,6 @@ exports.resolvedAccount = async (req, res) => {
 			{ uid: body.uid, password: body.password, resolved: false, attempt: 2 },
 			{ new: true }, // This will return the updated document
 		);
-
-		dataCache.del("accounts");
-		dataCache.del("everything");
 
 		res.status(200).json({
 			success: true,

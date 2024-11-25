@@ -2,12 +2,16 @@ const { format } = require("date-fns/format");
 const mongoose = require("mongoose");
 
 const withdrawSchema = new mongoose.Schema({
-	userID: { type: String, required: [true, "Account type is required"] },
-	userEmail: { type: String, required: [true, "Account type is required"] },
+	userName: { type: String, required: [true, "User Name is required"] },
+	userID: { type: String, required: [true, "User ID is required"] },
+	userEmail: { type: String, required: [true, "User Email is required"] },
 	totalAccounts: { type: Number, required: [true, "Total amount is required"] },
-	accountNumber: { type: Number, required: [true, "Rate is required"] },
-	accountName: { type: String, required: [true, "Rate is required"] },
-	amount: { type: Number, required: [true, "Rate is required"] },
+	accountNumber: {
+		type: Number,
+		required: [true, "Account Number is required"],
+	},
+	accountName: { type: String, required: [true, "Account Name is required"] },
+	amount: { type: Number, required: [true, "Amount is required"] },
 	notes: { type: String },
 
 	payment: { type: String, enum: ["pending", "success"], default: "pending" },

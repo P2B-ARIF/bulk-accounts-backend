@@ -4,6 +4,7 @@ const {
 	createWithdraw,
 	allWithdrawal,
 	confirmPayment,
+	withdrawList,
 } = require("./withdraw.controller");
 const isAdmin = require("../../middlewares/isAdmin");
 const router = express.Router();
@@ -33,6 +34,7 @@ const router = express.Router();
 router.post("/", authMiddleware, createWithdraw);
 
 //? admin routes
+router.get("/user-withdraw", withdrawList);
 router.get("/", isAdmin, allWithdrawal);
 router.put("/:id", isAdmin, confirmPayment);
 
