@@ -13,6 +13,8 @@ const withdrawSchema = new mongoose.Schema({
 	payment: { type: String, enum: ["pending", "success"], default: "pending" },
 	paymentProved: { type: String },
 
+	url: { type: String },
+
 	createdAt: {
 		date: { type: Date, default: new Date() },
 		date_fns: { type: String },

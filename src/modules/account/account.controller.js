@@ -87,29 +87,28 @@ exports.everyThings = async (req, res) => {
 			return acc;
 		}, {});
 
-		// Fetch user stats from cache or database
-		let userStats = dataCache.get("everything");
-		if (userStats) {
-			userStats = JSON.parse(userStats);
-		} else {
-			userStats = await getUserStats(id);
-			if (userStats) {
-				dataCache.set("everything", JSON.stringify(userStats)); // Cache the stats
-			}
-		}
+		// // Fetch user stats from cache or database
+		// let userStats = dataCache.get("everything");
+		// if (userStats) {
+		// 	userStats = JSON.parse(userStats);
+		// } else {
+		// 	userStats = await getUserStats(id);
+		// 	if (userStats) {
+		// 		dataCache.set("everything", JSON.stringify(userStats)); // Cache the stats
+		// 	}
+		// }
 
 		// Handle missing user stats
-		if (!userStats) {
-			return res.status(404).json({
-				success: false,
-				message: "User stats not found.",
-			});
-		}
+		// if (!userStats) {
+		// 	return res.status(404).json({
+		// 		success: false,
+		// 		message: "User stats not found.",
+		// 	});
+		// }
 
 		// Respond with the combined data
 		res.status(200).json({
 			success: true,
-			userStats,
 			accounts,
 			summary,
 			approved,
@@ -140,7 +139,7 @@ exports.resolvedAccount = async (req, res) => {
 			// Assuming you're updating the account details here if necessary
 			updatedAccount = await Account.findByIdAndUpdate(
 				req.params.id,
-				{ uid: body.uid, resolved: false, attempt: 1 },
+				{ uid: body.uid, password: body.password, resolved: false, attempt: 1 },
 				{ new: true }, // This will return the updated document
 			);
 		}
@@ -148,7 +147,7 @@ exports.resolvedAccount = async (req, res) => {
 		// Assuming you're updating the account details here if necessary
 		updatedAccount = await Account.findByIdAndUpdate(
 			req.params.id,
-			{ uid: body.uid, resolved: false, attempt: 2 },
+			{ uid: body.uid, password: body.password, resolved: false, attempt: 2 },
 			{ new: true }, // This will return the updated document
 		);
 

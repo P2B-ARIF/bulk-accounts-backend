@@ -65,14 +65,23 @@ exports.allWithdrawal = async (req, res) => {
 exports.confirmPayment = async (req, res) => {
 	try {
 		const id = req.params.id;
-		const result = await Withdraw.findByIdAndUpdate(id, { payment: "success" });
-		res
-			.status(201)
-			.json({
-				success: true,
-				message: "successfully confirmed payment",
-				result,
-			});
+		const { url } = req.body;
+
+		console.log(url);
+
+		const result = await Withdraw.findByIdAndUpdate(
+			id,
+			{
+				payment: "success",
+				url: url,
+			},
+			{ new: true },
+		);
+		res.status(201).json({
+			success: true,
+			message: "successfully confirmed payment",
+			result,
+		});
 	} catch (err) {
 		console.log(err, "err");
 		res
