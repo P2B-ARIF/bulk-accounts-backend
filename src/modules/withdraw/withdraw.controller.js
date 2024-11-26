@@ -102,6 +102,8 @@ exports.withdrawList = async (req, res) => {
 
 		const total = await Withdraw.countDocuments();
 
+		console.log(result, limit, page, total);
+
 		res.status(200).json({ success: true, result, total });
 	} catch (err) {
 		console.log(err, "err");
