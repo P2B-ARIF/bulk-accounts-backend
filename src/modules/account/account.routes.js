@@ -7,6 +7,7 @@ const {
 	listAccounts,
 	actionAccounts,
 	approvedAccounts,
+	norApprovedAccounts,
 } = require("./account.controller");
 const router = express.Router();
 
@@ -32,6 +33,7 @@ router.get("/everything", authMiddleware, everyThings);
 
 // admin routes
 router.get("/all", authMiddleware, listAccounts);
+router.get("/nor-approved", authMiddleware, norApprovedAccounts);
 router.get("/approved", authMiddleware, approvedAccounts);
 
 router.put("/", authMiddleware, actionAccounts);

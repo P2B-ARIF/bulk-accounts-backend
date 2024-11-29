@@ -3,10 +3,9 @@ const User = require("../auth/auth.model");
 const Account = require("./account.model");
 const {
 	updateUserDailyStats,
-	getUserStats,
-	getUserStatsCharts,
 } = require("../userDailyStats/dailyStats.controller");
 const Withdraw = require("../withdraw/withdraw.model");
+const BlackHole = require("../blackHole/blackHole.model");
 
 const dataCache = new NodeCache({ stdTTL: 600 });
 
@@ -129,45 +128,73 @@ exports.everyThings = async (req, res) => {
 exports.resolvedAccount = async (req, res) => {
 	try {
 		const body = req.body;
-		const id = req.params.id;
+		const { id } = req.params;
 		const { action } = req.query;
 
-		console.log(action, "action");
+		console.log(action, id, "action");
 
 		dataCache.del("accounts");
 		dataCache.del("everything");
 
-		if (action === "die") {
-			const dieAccount = await Account.findByIdAndUpdate(
-				req.params.id,
-				{ die: true },
-				{ new: true },
-			);
+		if (action === "die-move") {
+			const dieAccount = await Account.findByIdAndUpdate(id, { die: true });
+
+			if (!dieAccount) {
+				return res.status(404).json({
+					success: false,
+					message: "Account not found",
+				});
+			}
+
+			const blackHoleAccount = await BlackHole.create(dieAccount.toObject());
+
 			return res.status(200).json({
 				success: true,
-				message: "Account die updated successfully",
-				dieAccount,
+				message: "Account successfully moved to BlackHole",
+				data: blackHoleAccount,
 			});
 		}
 
-		const attemptExits = await Account.findById(id, { attempt: 0 });
-
-		let updatedAccount;
-
-		if (attemptExits) {
-			// Assuming you're updating the account details here if necessary
-			updatedAccount = await Account.findByIdAndUpdate(
-				req.params.id,
-				{ uid: body.uid, password: body.password, resolved: false, attempt: 1 },
-				{ new: true }, // This will return the updated document
+		if (action === "permanent-die") {
+			const permanentDie = await Account.findByIdAndUpdate(
+				id,
+				{ die: true },
+				{ new: true }, // Return updated document
 			);
+
+			if (!permanentDie) {
+				return res.status(404).json({
+					success: false,
+					message: "Account not found for permanent deletion",
+				});
+			}
+			return res.status(200).json({
+				success: true,
+				message: "Account permanently deleted successfully",
+				permanentDie,
+			});
 		}
 
-		// Assuming you're updating the account details here if necessary
-		updatedAccount = await Account.findByIdAndUpdate(
-			req.params.id,
-			{ uid: body.uid, password: body.password, resolved: false, attempt: 2 },
-			{ new: true }, // This will return the updated document
+		// Handle regular account updates
+		const account = await Account.findById(id);
+
+		if (!account) {
+			return res.status(404).json({
+				success: false,
+				message: "Account not found",
+			});
+		}
+
+		// Determine attempt logic and update accordingly
+		const updatedAccount = await Account.findByIdAndUpdate(
+			id,
+			{
+				uid: body.uid || account.uid,
+				password: body.password || account.password,
+				resolved: false,
+				attempt: account.attempt < 2 ? account.attempt + 1 : account.attempt,
+			},
+			{ new: true }, // Return updated document
 		);
 
 		res.status(200).json({
@@ -267,6 +294,20 @@ exports.actionAccounts = async (req, res) => {
 			message: "Error updating accounts",
 			error: err.message,
 		});
+	}
+};
+
+exports.norApprovedAccounts = async (req, res) => {
+	try {
+		const accounts = await Account.find({
+			$nor: [{ approved: true }, { resolved: false }, { die: true }],
+		});
+
+		res.status(200).json(accounts);
+	} catch (err) {
+		res
+			.status(500)
+			.json({ message: "Error listing accounts", error: err.message });
 	}
 };
 

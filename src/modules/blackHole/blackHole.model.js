@@ -12,7 +12,6 @@ const BlackHoleSchema = new mongoose.Schema({
 	accountType: { type: String },
 	accountFormat: {
 		type: String,
-
 		set: value => value.toLowerCase(),
 	},
 	rate: { type: Number },
