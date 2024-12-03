@@ -8,24 +8,14 @@ const {
 	actionAccounts,
 	approvedAccounts,
 	norApprovedAccounts,
+	listSaleAccounts,
+	deleteSaleAccounts,
 } = require("./account.controller");
+const isAdmin = require("../../middlewares/isAdmin");
 const router = express.Router();
 
 // POST: Create a new account
 router.post("/create", authMiddleware, createAccount);
-
-// GET: Fetch all accounts
-// router.get("/", getAllAccounts);
-
-// // GET: Fetch a single account by ID
-// router.get("/:id", getAccountById);
-
-// PUT: Update an account by ID
-// router.put("/:id", updateAccount);
-
-// DELETE: Remove an account by ID
-// router.delete("/:id", deleteAccount);
-
 router.put("/:id", authMiddleware, resolvedAccount);
 
 // user all data fetching routes
@@ -35,7 +25,9 @@ router.get("/everything", authMiddleware, everyThings);
 router.get("/all", authMiddleware, listAccounts);
 router.get("/nor-approved", authMiddleware, norApprovedAccounts);
 router.get("/approved", authMiddleware, approvedAccounts);
-
 router.put("/", authMiddleware, actionAccounts);
+
+router.get("/sale", isAdmin, listSaleAccounts);
+router.put("/sale/sold", deleteSaleAccounts);
 
 module.exports = router;

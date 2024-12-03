@@ -311,6 +311,41 @@ exports.norApprovedAccounts = async (req, res) => {
 	}
 };
 
+exports.listSaleAccounts = async (req, res) => {
+	try {
+		const accounts = await BlackHole.find({});
+		res.status(200).json(accounts);
+	} catch (err) {
+		res
+			.status(500)
+			.json({ message: "Error listing sale accounts", error: err.message });
+	}
+};
+
+exports.deleteSaleAccounts = async (req, res) => {
+	try {
+		const accountUIDs = req.body;
+
+		if (!accountUIDs || accountUIDs.length === 0) {
+			return res.status(400).json({ message: "No account IDs provided" });
+		}
+
+		const result = await BlackHole.deleteMany({ uid: { $in: accountUIDs } });
+
+		if (result.deletedCount > 0) {
+			res.status(200).json({
+				message: `${result.deletedCount} accounts successfully deleted.`,
+			});
+		} else {
+			res.status(404).json({ message: "No accounts found to delete." });
+		}
+	} catch (err) {
+		res.status(500).json({
+			message: "Error deleting sale accounts.",
+			error: err.message,
+		});
+	}
+};
 //! Experimental feature for testing
 
 exports.listFacebook = async (req, res) => {
