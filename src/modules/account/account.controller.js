@@ -1,9 +1,9 @@
 const NodeCache = require("node-cache");
 const User = require("../auth/auth.model");
 const Account = require("./account.model");
-const {
-	updateUserDailyStats,
-} = require("../userDailyStats/dailyStats.controller");
+// const {
+// 	updateUserDailyStats,
+// } = require("../userDailyStats/dailyStats.controller");
 const Withdraw = require("../withdraw/withdraw.model");
 const BlackHole = require("../blackHole/blackHole.model");
 
@@ -34,14 +34,14 @@ exports.createAccount = async (req, res) => {
 
 		dataCache.del("accounts");
 		dataCache.del("everything");
-		updateUserDailyStats(
-			{
-				accountType: body.accountType,
-				accountFormat: body.accountFormat,
-				rate: body.rate,
-			},
-			id,
-		);
+		// updateUserDailyStats(
+		// 	{
+		// 		accountType: body.accountType,
+		// 		accountFormat: body.accountFormat,
+		// 		rate: body.rate,
+		// 	},
+		// 	id,
+		// );
 		res
 			.status(201)
 			.json({ success: true, message: "Account created successfully" });
@@ -131,7 +131,7 @@ exports.resolvedAccount = async (req, res) => {
 		const { id } = req.params;
 		const { action } = req.query;
 
-		console.log(action, id, "action");
+		// console.log(action, id, "action");
 
 		dataCache.del("accounts");
 		dataCache.del("everything");
