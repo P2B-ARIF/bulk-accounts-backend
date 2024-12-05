@@ -12,6 +12,7 @@ const Message = require("./modules/message/message.routes");
 const accountRoutes = require("./modules/account/account.routes");
 const withdrawRoutes = require("./modules/withdraw/withdraw.routes");
 const maintenanceRoutes = require("./modules/maintenance/maintenance.routes");
+const { default: rateLimit } = require("express-rate-limit");
 // const userDailyStats = require("./modules/userDailyStats/dailyStats.routes");
 
 // const { checkBlockStatus } = require("./middlewares/checkBlockStatus");
@@ -21,6 +22,20 @@ const maintenanceRoutes = require("./modules/maintenance/maintenance.routes");
 // 	methods: ["GET", "POST", "PUT", "DELETE"],
 // 	credentials: true,
 // };
+
+// Rate limiter (60 requests per minute)
+const limiter = rateLimit({
+	windowMs: 5 * 1000,
+	max: 150,
+	message: {
+		status: 429,
+		error: "Too many requests, please try again after a minute.",
+	},
+	standardHeaders: true,
+	legacyHeaders: false,
+});
+
+app.use(limiter);
 
 // Middleware
 app.use(cors());
