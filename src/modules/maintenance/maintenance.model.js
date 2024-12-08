@@ -4,7 +4,7 @@ const MaintenanceSchema = new mongoose.Schema(
 	{
 		enabled: { type: Boolean, default: false },
 		message: { type: String, default: "" },
-		endTime: { type: Date },
+		password: { type: String },
 	},
 	{ timestamps: true },
 );

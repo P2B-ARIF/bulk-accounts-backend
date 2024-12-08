@@ -192,6 +192,7 @@ exports.resolvedAccount = async (req, res) => {
 				uid: body.uid || account.uid,
 				password: body.password || account.password,
 				resolved: false,
+				downloaded: false,
 				attempt: account.attempt < 2 ? account.attempt + 1 : account.attempt,
 			},
 			{ new: true }, // Return updated document
@@ -311,6 +312,24 @@ exports.norApprovedAccounts = async (req, res) => {
 	}
 };
 
+exports.downloadedAccounts = async (req, res) => {
+	try {
+		const UIDs = req.body;
+		const accounts = await Account.updateMany(
+			{ uid: { $in: UIDs } },
+			{ $set: { downloaded: true } },
+			{ new: true },
+		);
+		return res
+			.status(200)
+			.json({ message: "Downloaded status updated", accounts });
+	} catch (err) {
+		res
+			.status(500)
+			.json({ message: "Error update downloaded status", error: err.message });
+	}
+};
+
 exports.listSaleAccounts = async (req, res) => {
 	try {
 		const accounts = await BlackHole.find({});
@@ -346,28 +365,29 @@ exports.deleteSaleAccounts = async (req, res) => {
 		});
 	}
 };
-//! Experimental feature for testing
 
-exports.listFacebook = async (req, res) => {
-	try {
-		const { accountType } = req.query;
+// //! Experimental feature for testing
 
-		let account;
+// exports.listFacebook = async (req, res) => {
+// 	try {
+// 		const { accountType } = req.query;
 
-		if (dataCache.has("accounts")) {
-			account = JSON.parse(dataCache.get("accounts"));
-		} else {
-			account = await Account.find({
-				accountType: accountType,
-				userEmail: req.user.email,
-			}).select("-_id -userID");
-		}
+// 		let account;
 
-		dataCache.set("accounts", JSON.stringify(account));
-		res.status(201).json({ success: true, length: account.length, account });
-	} catch (err) {
-		res
-			.status(500)
-			.json({ message: "Error creating account", error: err.message });
-	}
-};
+// 		if (dataCache.has("accounts")) {
+// 			account = JSON.parse(dataCache.get("accounts"));
+// 		} else {
+// 			account = await Account.find({
+// 				accountType: accountType,
+// 				userEmail: req.user.email,
+// 			}).select("-_id -userID");
+// 		}
+
+// 		dataCache.set("accounts", JSON.stringify(account));
+// 		res.status(201).json({ success: true, length: account.length, account });
+// 	} catch (err) {
+// 		res
+// 			.status(500)
+// 			.json({ message: "Error creating account", error: err.message });
+// 	}
+// };

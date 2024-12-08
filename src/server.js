@@ -13,6 +13,7 @@ const accountRoutes = require("./modules/account/account.routes");
 const withdrawRoutes = require("./modules/withdraw/withdraw.routes");
 const maintenanceRoutes = require("./modules/maintenance/maintenance.routes");
 const { default: rateLimit } = require("express-rate-limit");
+const { deleteDieAccount } = require("./middlewares/deleteDieAccount");
 // const userDailyStats = require("./modules/userDailyStats/dailyStats.routes");
 
 // const { checkBlockStatus } = require("./middlewares/checkBlockStatus");
@@ -45,6 +46,7 @@ app.use(helmet());
 // app.use(cors(corsOptions));
 
 dbConnect();
+deleteDieAccount();
 // checkBlockStatus();
 
 // Routes

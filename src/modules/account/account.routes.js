@@ -10,13 +10,14 @@ const {
 	norApprovedAccounts,
 	listSaleAccounts,
 	deleteSaleAccounts,
+	downloadedAccounts,
 } = require("./account.controller");
 const isAdmin = require("../../middlewares/isAdmin");
 const router = express.Router();
 
 // POST: Create a new account
 router.post("/create", authMiddleware, createAccount);
-router.put("/:id", authMiddleware, resolvedAccount);
+router.put("/resolved/:id", authMiddleware, resolvedAccount);
 
 // user all data fetching routes
 router.get("/everything", authMiddleware, everyThings);
@@ -26,6 +27,7 @@ router.get("/all", authMiddleware, listAccounts);
 router.get("/nor-approved", authMiddleware, norApprovedAccounts);
 router.get("/approved", authMiddleware, approvedAccounts);
 router.put("/", authMiddleware, actionAccounts);
+router.put("/downloaded", authMiddleware, downloadedAccounts);
 
 router.get("/sale", isAdmin, listSaleAccounts);
 router.put("/sale/sold", deleteSaleAccounts);
