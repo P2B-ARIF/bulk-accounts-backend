@@ -128,7 +128,7 @@ exports.userBlock = async (req, res) => {
 exports.getCurrentUser = async (req, res) => {
 	try {
 		const user = await User.findById(req.user.id).select(
-			"-_id lastLogin name email isBlocked role",
+			"-_id lastLogin name email isBlocked role nickname",
 		);
 		if (!user) {
 			return res.status(404).json({ access: false, message: "User not found" });
@@ -166,5 +166,25 @@ exports.getAllUsers = async (req, res) => {
 		res.json(users);
 	} catch (err) {
 		res.status(500).json({ access: false, message: "Something went wrong!" });
+	}
+};
+
+exports.setNickname = async (req, res) => {
+	try {
+		const { id } = req.user;
+		const { nickname } = req.body;
+
+		const result = await User.findByIdAndUpdate(
+			id,
+			{ nickname: nickname },
+			{ new: true },
+		);
+		res.status(200).json({
+			success: true,
+			message: "Successfully updated nickname",
+			result,
+		});
+	} catch (err) {
+		res.status(500).json({ message: "Updating field in nickname" });
 	}
 };

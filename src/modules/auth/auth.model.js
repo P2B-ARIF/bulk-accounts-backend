@@ -23,6 +23,11 @@ const userSchema = new mongoose.Schema({
 		type: Number,
 		required: [true, "Number is required"],
 	},
+
+	nickname: {
+		type: String,
+	},
+
 	role: {
 		type: String,
 		enum: ["admin", "user"],

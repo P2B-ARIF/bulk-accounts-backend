@@ -7,6 +7,7 @@ const {
 	userBlock,
 	secretVerify,
 	getAllUsers,
+	setNickname,
 } = require("./auth.controller");
 const authMiddleware = require("../../middlewares/authMiddleware");
 const isAdmin = require("../../middlewares/isAdmin");
@@ -17,6 +18,8 @@ router.post("/register", registerUser);
 router.post("/login", loginUser);
 
 router.get("/secret", secretVerify);
+
+router.put("/nickname", authMiddleware, setNickname);
 
 // Protected route
 router.get("/", authMiddleware, getCurrentUser);

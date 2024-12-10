@@ -14,6 +14,8 @@ const withdrawRoutes = require("./modules/withdraw/withdraw.routes");
 const maintenanceRoutes = require("./modules/maintenance/maintenance.routes");
 const { default: rateLimit } = require("express-rate-limit");
 const { deleteDieAccount } = require("./middlewares/deleteDieAccount");
+const cron = require("node-cron");
+
 // const userDailyStats = require("./modules/userDailyStats/dailyStats.routes");
 
 // const { checkBlockStatus } = require("./middlewares/checkBlockStatus");
@@ -46,7 +48,18 @@ app.use(helmet());
 // app.use(cors(corsOptions));
 
 dbConnect();
-deleteDieAccount();
+
+// Schedule the job to run every day at midnight
+cron.schedule("0 0 * * *", async () => {
+	try {
+		console.log("Running scheduled task: deleteDieAccount");
+		await deleteDieAccount();
+	} catch (err) {
+		console.error("Error running scheduled task:", err.message);
+	}
+});
+
+// deleteDieAccount();
 // checkBlockStatus();
 
 // Routes
