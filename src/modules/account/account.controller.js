@@ -136,6 +136,17 @@ exports.resolvedAccount = async (req, res) => {
 		dataCache.del("accounts");
 		dataCache.del("everything");
 
+		if (action === "approved") {
+			const result = await Account.findByIdAndUpdate(id, {
+				$set: { approved: true, resolved: false },
+			});
+			return res.status(200).json({
+				success: true,
+				message: "Account Approved",
+				data: result,
+			});
+		}
+
 		if (action === "die-move") {
 			const dieAccount = await Account.findByIdAndUpdate(id, { die: true });
 
@@ -358,6 +369,24 @@ exports.deleteSaleAccounts = async (req, res) => {
 		} else {
 			res.status(404).json({ message: "No accounts found to delete." });
 		}
+	} catch (err) {
+		res.status(500).json({
+			message: "Error deleting sale accounts.",
+			error: err.message,
+		});
+	}
+};
+
+exports.deleteAccount = async (req, res) => {
+	try {
+		const { id } = req.params;
+		if (!id) {
+			return res.status(400).json({ message: "No account IDs provided" });
+		}
+		await Account.findByIdAndDelete(id);
+		res.status(200).json({
+			message: `Account successfully deleted.`,
+		});
 	} catch (err) {
 		res.status(500).json({
 			message: "Error deleting sale accounts.",

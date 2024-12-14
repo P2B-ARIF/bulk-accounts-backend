@@ -4,7 +4,7 @@ const deleteDieAccount = async () => {
 	try {
 		// Calculate the date 10 days ago
 		const tenDaysAgo = new Date();
-		tenDaysAgo.setDate(tenDaysAgo.getDate() - 10);
+		tenDaysAgo.setDate(tenDaysAgo.getDate() - 20);
 
 		const result = await Account.deleteMany({
 			$and: [{ "createdAt.date": { $lt: tenDaysAgo } }, { die: true }],

@@ -11,6 +11,7 @@ const {
 	listSaleAccounts,
 	deleteSaleAccounts,
 	downloadedAccounts,
+	deleteAccount,
 } = require("./account.controller");
 const isAdmin = require("../../middlewares/isAdmin");
 const router = express.Router();
@@ -18,6 +19,8 @@ const router = express.Router();
 // POST: Create a new account
 router.post("/create", authMiddleware, createAccount);
 router.put("/resolved/:id", authMiddleware, resolvedAccount);
+
+router.delete("/delete/:id", authMiddleware, deleteAccount);
 
 // user all data fetching routes
 router.get("/everything", authMiddleware, everyThings);
