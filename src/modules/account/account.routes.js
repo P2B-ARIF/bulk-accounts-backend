@@ -12,6 +12,7 @@ const {
 	deleteSaleAccounts,
 	downloadedAccounts,
 	deleteAccount,
+	getAllAccounts,
 } = require("./account.controller");
 const isAdmin = require("../../middlewares/isAdmin");
 const router = express.Router();
@@ -27,6 +28,7 @@ router.get("/everything", authMiddleware, everyThings);
 
 // admin routes
 router.get("/all", authMiddleware, listAccounts);
+router.get("/all-accounts", authMiddleware, getAllAccounts);
 router.get("/nor-approved", authMiddleware, norApprovedAccounts);
 router.get("/approved", authMiddleware, approvedAccounts);
 router.put("/", authMiddleware, actionAccounts);

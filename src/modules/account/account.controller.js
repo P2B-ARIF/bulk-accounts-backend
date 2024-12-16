@@ -252,8 +252,6 @@ exports.actionAccounts = async (req, res) => {
 		const { action } = req.query;
 		const accountUIDs = req.body;
 
-		// console.log(action, accountUIDs);
-
 		if (!Array.isArray(accountUIDs) || accountUIDs.length === 0) {
 			return res
 				.status(400)
@@ -269,19 +267,13 @@ exports.actionAccounts = async (req, res) => {
 			);
 		}
 		if (action === "attempt") {
-			// const updatedAccounts = await Account.find({
-			// 	uid: { $in: accountUIDs },
-			// 	attempt: { $gt: 2 },
-			// });
-
-			// console.log(updatedAccounts, "updatedAccounts");
-
 			result = await Account.updateMany(
 				{ uid: { $in: accountUIDs } },
 				{ $set: { resolved: true } }, // Set `approved` to true
 				{ new: true },
 			);
 		}
+
 		if (action === "die") {
 			result = await Account.updateMany(
 				{ uid: { $in: accountUIDs } },
@@ -290,12 +282,36 @@ exports.actionAccounts = async (req, res) => {
 			);
 		}
 
-		// // Update all documents where `uid` matches any value in the numbers array
+		if (action === "move") {
+			const accountsToMove = await Account.find({ uid: { $in: accountUIDs } });
 
-		// Send response with the update result
+			if (accountsToMove.length === 0) {
+				return res.status(404).json({
+					success: false,
+					message: "No accounts found to move",
+				});
+			}
+
+			// Update all matched accounts with die: true
+			await Account.updateMany(
+				{ uid: { $in: accountUIDs } },
+				{ $set: { die: true } },
+			);
+
+			const blackHoleAccounts = accountsToMove.map(account =>
+				account.toObject(),
+			);
+			await BlackHole.insertMany(blackHoleAccounts);
+
+			return res.status(200).json({
+				success: true,
+				message: `${accountsToMove.length} accounts moved to BlackHole successfully`,
+				data: blackHoleAccounts,
+			});
+		}
+
 		res.status(200).json({
 			success: true,
-			// message: `accounts updated successfully`,
 			message: `${result.modifiedCount} accounts updated successfully`,
 		});
 	} catch (err) {
@@ -395,28 +411,24 @@ exports.deleteAccount = async (req, res) => {
 	}
 };
 
-// //! Experimental feature for testing
+exports.getAllAccounts = async (req, res) => {
+	try {
+		// Fetch accounts with better performance using `lean()`
+		const accounts = await Account.find({}).lean();
 
-// exports.listFacebook = async (req, res) => {
-// 	try {
-// 		const { accountType } = req.query;
-
-// 		let account;
-
-// 		if (dataCache.has("accounts")) {
-// 			account = JSON.parse(dataCache.get("accounts"));
-// 		} else {
-// 			account = await Account.find({
-// 				accountType: accountType,
-// 				userEmail: req.user.email,
-// 			}).select("-_id -userID");
-// 		}
-
-// 		dataCache.set("accounts", JSON.stringify(account));
-// 		res.status(201).json({ success: true, length: account.length, account });
-// 	} catch (err) {
-// 		res
-// 			.status(500)
-// 			.json({ message: "Error creating account", error: err.message });
-// 	}
-// };
+		// Respond with the retrieved accounts
+		res.status(200).json({
+			success: true,
+			message: "Accounts retrieved successfully",
+			data: accounts,
+		});
+	} catch (err) {
+		// Handle errors
+		console.error("Error fetching accounts:", err.message);
+		res.status(500).json({
+			success: false,
+			message: "Error fetching accounts",
+			error: err.message,
+		});
+	}
+};
