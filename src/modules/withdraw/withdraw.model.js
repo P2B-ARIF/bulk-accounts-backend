@@ -20,7 +20,7 @@ const withdrawSchema = new mongoose.Schema({
 	url: { type: String },
 
 	createdAt: {
-		date: { type: Date, default: new Date() },
+		date: { type: Date, default: Date.now },
 		date_fns: { type: String },
 	},
 });

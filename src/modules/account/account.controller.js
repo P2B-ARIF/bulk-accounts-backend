@@ -6,6 +6,7 @@ const Account = require("./account.model");
 // } = require("../userDailyStats/dailyStats.controller");
 const Withdraw = require("../withdraw/withdraw.model");
 const BlackHole = require("../blackHole/blackHole.model");
+const Sale = require("../sale/sale.model");
 
 const dataCache = new NodeCache({ stdTTL: 600 });
 
@@ -278,11 +279,10 @@ exports.actionAccounts = async (req, res) => {
 			result = await Account.updateMany(
 				{ uid: { $in: accountUIDs } },
 				{ $set: { die: true } },
-				// Set `approved` to true
 			);
 		}
 
-		if (action === "move") {
+		if (action === "sale_die") {
 			const accountsToMove = await Account.find({ uid: { $in: accountUIDs } });
 
 			if (accountsToMove.length === 0) {
@@ -298,15 +298,38 @@ exports.actionAccounts = async (req, res) => {
 				{ $set: { die: true } },
 			);
 
-			const blackHoleAccounts = accountsToMove.map(account =>
-				account.toObject(),
-			);
-			await BlackHole.insertMany(blackHoleAccounts);
+			const saleAccounts = accountsToMove.map(account => account.toObject());
+			await Sale.insertMany(saleAccounts);
 
 			return res.status(200).json({
 				success: true,
-				message: `${accountsToMove.length} accounts moved to BlackHole successfully`,
-				data: blackHoleAccounts,
+				message: `${accountsToMove.length} accounts moved to Sale successfully`,
+				data: saleAccounts,
+			});
+		}
+		if (action === "sale_approved") {
+			const accountsToMove = await Account.find({ uid: { $in: accountUIDs } });
+
+			if (accountsToMove.length === 0) {
+				return res.status(404).json({
+					success: false,
+					message: "No accounts found to move",
+				});
+			}
+
+			// Update all matched accounts with die: true
+			await Account.updateMany(
+				{ uid: { $in: accountUIDs } },
+				{ $set: { approved: true } },
+			);
+
+			const saleAccounts = accountsToMove.map(account => account.toObject());
+			await Sale.insertMany(saleAccounts);
+
+			return res.status(200).json({
+				success: true,
+				message: `${accountsToMove.length} accounts moved to Sale successfully`,
+				data: saleAccounts,
 			});
 		}
 
@@ -359,7 +382,7 @@ exports.downloadedAccounts = async (req, res) => {
 
 exports.listSaleAccounts = async (req, res) => {
 	try {
-		const accounts = await BlackHole.find({});
+		const accounts = await Sale.find({});
 		res.status(200).json(accounts);
 	} catch (err) {
 		res
@@ -369,6 +392,43 @@ exports.listSaleAccounts = async (req, res) => {
 };
 
 exports.deleteSaleAccounts = async (req, res) => {
+	try {
+		const accountUIDs = req.body;
+
+		if (!accountUIDs || accountUIDs.length === 0) {
+			return res.status(400).json({ message: "No account IDs provided" });
+		}
+
+		const result = await Sale.deleteMany({ uid: { $in: accountUIDs } });
+
+		if (result.deletedCount > 0) {
+			res.status(200).json({
+				message: `${result.deletedCount} accounts successfully deleted.`,
+			});
+		} else {
+			res.status(404).json({ message: "No accounts found to delete." });
+		}
+	} catch (err) {
+		res.status(500).json({
+			message: "Error deleting sale accounts.",
+			error: err.message,
+		});
+	}
+};
+
+exports.listBlackHoleAccounts = async (req, res) => {
+	try {
+		const accounts = await BlackHole.find({});
+		res.status(200).json(accounts);
+	} catch (err) {
+		res.status(500).json({
+			message: "Error listing black hole accounts",
+			error: err.message,
+		});
+	}
+};
+
+exports.deleteBlackHoleAccounts = async (req, res) => {
 	try {
 		const accountUIDs = req.body;
 
@@ -387,7 +447,7 @@ exports.deleteSaleAccounts = async (req, res) => {
 		}
 	} catch (err) {
 		res.status(500).json({
-			message: "Error deleting sale accounts.",
+			message: "Error deleting black hole accounts.",
 			error: err.message,
 		});
 	}

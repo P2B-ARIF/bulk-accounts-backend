@@ -29,7 +29,7 @@ const AccountSchema = new mongoose.Schema({
 	attempt: { type: Number, default: 0 },
 	die: { type: Boolean, default: false },
 	createdAt: {
-		date: { type: Date, default: new Date() },
+		date: { type: Date, default: Date.now },
 		date_fns: { type: String },
 	},
 });

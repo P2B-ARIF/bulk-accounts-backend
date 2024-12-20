@@ -13,6 +13,8 @@ const {
 	downloadedAccounts,
 	deleteAccount,
 	getAllAccounts,
+	listBlackHoleAccounts,
+	deleteBlackHoleAccounts,
 } = require("./account.controller");
 const isAdmin = require("../../middlewares/isAdmin");
 const router = express.Router();
@@ -36,5 +38,8 @@ router.put("/downloaded", authMiddleware, downloadedAccounts);
 
 router.get("/sale", isAdmin, listSaleAccounts);
 router.put("/sale/sold", deleteSaleAccounts);
+
+router.get("/black-hole", isAdmin, listBlackHoleAccounts);
+router.put("/black-hole/sold", isAdmin, deleteBlackHoleAccounts);
 
 module.exports = router;
