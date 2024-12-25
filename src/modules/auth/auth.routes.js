@@ -8,6 +8,7 @@ const {
 	secretVerify,
 	getAllUsers,
 	setNickname,
+	deleteUser,
 } = require("./auth.controller");
 const authMiddleware = require("../../middlewares/authMiddleware");
 const isAdmin = require("../../middlewares/isAdmin");
@@ -28,5 +29,6 @@ router.get("/", authMiddleware, getCurrentUser);
 router.put("/forgot-password", forgotPassword);
 router.put("/handle-block", userBlock);
 router.get("/get-allUsers", isAdmin, getAllUsers);
+router.delete("/delete", isAdmin, deleteUser);
 
 module.exports = router;
