@@ -48,3 +48,37 @@ exports.markAsSeen = async (req, res) => {
 		res.status(500).json({ error: "Failed to mark message as seen" });
 	}
 };
+
+exports.getMessages = async (req, res) => {
+	try {
+		const messages = await Message.find({});
+		res.status(200).json({ success: true, data: messages });
+	} catch (err) {
+		res.status(500).json({ success: false, error: "Failed to get messages" });
+	}
+};
+
+exports.deleteMessage = async (req, res) => {
+	try {
+		const { id } = req.params;
+		if (!id) {
+			return res
+				.status(400)
+				.json({ success: false, error: "Message ID is required" });
+		}
+
+		const result = await Message.findByIdAndDelete(id);
+		if (!result) {
+			return res
+				.status(404)
+				.json({ success: false, error: "Message not found" });
+		}
+		res.status(200).json({
+			success: true,
+			message: "Message deleted successfully",
+			data: result,
+		});
+	} catch (err) {
+		res.status(500).json({ success: false, error: "Failed to delete message" });
+	}
+};
