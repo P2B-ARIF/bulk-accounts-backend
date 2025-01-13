@@ -15,6 +15,7 @@ const maintenanceRoutes = require("./modules/maintenance/maintenance.routes");
 const { default: rateLimit } = require("express-rate-limit");
 const { deleteDieAccount } = require("./middlewares/deleteDieAccount");
 const cron = require("node-cron");
+const { default: axios } = require("axios");
 
 // const userDailyStats = require("./modules/userDailyStats/dailyStats.routes");
 
