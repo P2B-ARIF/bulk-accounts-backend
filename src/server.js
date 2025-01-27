@@ -78,6 +78,25 @@ app.get("/", (req, res) => {
 	res.send("Hello World!");
 });
 
+app.get("/api/mail", async (req, res) => {
+	const { mail } = req.query;
+
+	const username = "2vhy3a33c0";
+	const domain = "5scode.email";
+
+	// https://5smail.email/mail.php?mail=${username}%40${domain}
+	try {
+		const response = await axios.get(
+			`https://5smail.email/mail.php?mail=${username}%40${domain}`,
+		);
+
+		console.log(response, response.data);
+		res.json(response.data);
+	} catch (error) {
+		res.status(500).json({ error: error.message });
+	}
+});
+
 app.listen(port, () => {
 	console.log(`Server is running on port ${port}`);
 });
