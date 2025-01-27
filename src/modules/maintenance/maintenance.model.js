@@ -6,6 +6,8 @@ const MaintenanceSchema = new mongoose.Schema(
 		message: { type: String, default: "" },
 		password: { type: String },
 		mailbox: { type: String },
+		tempmail: { type: Boolean },
+		mailboxToggle: { type: Boolean },
 	},
 	{ timestamps: true },
 );

@@ -16,6 +16,7 @@ const { default: rateLimit } = require("express-rate-limit");
 const { deleteDieAccount } = require("./middlewares/deleteDieAccount");
 const cron = require("node-cron");
 const { default: axios } = require("axios");
+const Account = require("./modules/account/account.model");
 
 // const userDailyStats = require("./modules/userDailyStats/dailyStats.routes");
 
@@ -78,24 +79,43 @@ app.get("/", (req, res) => {
 	res.send("Hello World!");
 });
 
-app.get("/api/mail", async (req, res) => {
-	const { mail } = req.query;
-
-	const username = "2vhy3a33c0";
-	const domain = "5scode.email";
-
-	// https://5smail.email/mail.php?mail=${username}%40${domain}
+app.put("/api/accounts/delete", async (req, res) => {
 	try {
-		const response = await axios.get(
-			`https://5smail.email/mail.php?mail=${username}%40${domain}`,
-		);
+		const tenDaysAgo = new Date(Date.now() - 10 * 24 * 60 * 60 * 1000);
 
-		console.log(response, response.data);
-		res.json(response.data);
-	} catch (error) {
-		res.status(500).json({ error: error.message });
+		const { deletedCount } = await Account.deleteMany({
+			"createdAt.date": { $lt: tenDaysAgo },
+			die: true,
+		});
+
+		console.log(`${deletedCount} accounts deleted..`);
+		return res
+			.status(200)
+			.json({ message: `${deletedCount} accounts deleted.` });
+	} catch (err) {
+		console.error("Error deleting accounts:", err.message);
+		return res.status(500).json({ error: "Failed to delete accounts." });
 	}
 });
+
+// app.get("/api/mail", async (req, res) => {
+// 	const { mail } = req.query;
+
+// 	const username = "2vhy3a33c0";
+// 	const domain = "5scode.email";
+
+// 	// https://5smail.email/mail.php?mail=${username}%40${domain}
+// 	try {
+// 		const response = await axios.get(
+// 			`https://5smail.email/mail.php?mail=${username}%40${domain}`,
+// 		);
+
+// 		console.log(response, response.data);
+// 		res.json(response.data);
+// 	} catch (error) {
+// 		res.status(500).json({ error: error.message });
+// 	}
+// });
 
 app.listen(port, () => {
 	console.log(`Server is running on port ${port}`);

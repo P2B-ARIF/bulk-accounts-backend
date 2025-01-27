@@ -49,7 +49,35 @@ exports.changePassword = async (req, res) => {
 
 exports.updateMailBox = async (req, res) => {
 	try {
-		const { mailbox } = req.body;
+		const { mailbox, tempmail, mailboxToggle } = req.body;
+
+		if (tempmail === true || tempmail === false) {
+			// Update the document
+			const result = await Maintenance.findOneAndUpdate(
+				{},
+				{ tempmail }, // Directly using the mailbox value instead of wrapping it in an object
+				{ new: true, upsert: true }, // Create a new document if it doesn't exist
+			);
+
+			return res.status(200).json({
+				result,
+				message: "Tempmail updated successfully",
+			});
+		}
+
+		if (mailboxToggle === true || mailboxToggle === false) {
+			// Update the document
+			const result = await Maintenance.findOneAndUpdate(
+				{},
+				{ mailboxToggle }, // Directly using the mailbox value instead of wrapping it in an object
+				{ new: true, upsert: true }, // Create a new document if it doesn't exist
+			);
+
+			return res.status(200).json({
+				result,
+				message: "mailboxToggle updated successfully",
+			});
+		}
 
 		// Validate input
 		if (!mailbox) {
