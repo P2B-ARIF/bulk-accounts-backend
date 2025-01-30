@@ -14,10 +14,12 @@ const dataCache = new NodeCache({ stdTTL: 600 });
 
 // create a facebook account
 exports.createAccount = async (req, res) => {
-	try {
-		const body = req.body;
-		const { id, email } = req.user;
+	const body = req.body;
+	const { id, email } = req.user;
 
+	console.log(body, id, email);
+
+	try {
 		if (!body.key && !body.cookie) {
 			return res.status(400).json({ message: "Missing required fields" });
 		}
