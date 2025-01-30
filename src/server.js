@@ -76,7 +76,7 @@ app.use("/api/maintenance", maintenanceRoutes);
 
 // Start the server
 app.get("/", (req, res) => {
-	res.send("Hello World!");
+	res.send("Hello World! v1.0.0");
 });
 
 app.put("/api/accounts/delete", async (req, res) => {
