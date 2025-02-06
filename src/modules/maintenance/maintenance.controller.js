@@ -49,55 +49,38 @@ exports.changePassword = async (req, res) => {
 
 exports.updateMailBox = async (req, res) => {
 	try {
-		const { mailbox, tempmail, mailboxToggle } = req.body;
+		const updateFields = {};
+		const { mailbox, tempmail, mailboxToggle, embedmail, embedMailToggle } =
+			req.body;
 
-		if (tempmail === true || tempmail === false) {
-			// Update the document
-			const result = await Maintenance.findOneAndUpdate(
-				{},
-				{ tempmail }, // Directly using the mailbox value instead of wrapping it in an object
-				{ new: true, upsert: true }, // Create a new document if it doesn't exist
-			);
+		// Check which fields are present in the request body and update accordingly
+		if (tempmail !== undefined) updateFields.tempmail = tempmail;
+		if (mailboxToggle !== undefined) updateFields.mailboxToggle = mailboxToggle;
+		if (embedMailToggle !== undefined)
+			updateFields.embedMailToggle = embedMailToggle;
+		if (mailbox) updateFields.mailbox = mailbox;
+		if (embedmail) updateFields.embedmail = embedmail;
 
-			return res.status(200).json({
-				result,
-				message: "Tempmail updated successfully",
-			});
-		}
-
-		if (mailboxToggle === true || mailboxToggle === false) {
-			// Update the document
-			const result = await Maintenance.findOneAndUpdate(
-				{},
-				{ mailboxToggle }, // Directly using the mailbox value instead of wrapping it in an object
-				{ new: true, upsert: true }, // Create a new document if it doesn't exist
-			);
-
-			return res.status(200).json({
-				result,
-				message: "mailboxToggle updated successfully",
-			});
-		}
-
-		// Validate input
-		if (!mailbox) {
-			return res.status(400).json({ message: "Mailbox value is required" });
+		// If no valid fields are found, return an error
+		if (Object.keys(updateFields).length === 0) {
+			return res
+				.status(400)
+				.json({ message: "No valid fields provided for update" });
 		}
 
 		// Update the document
-		const result = await Maintenance.findOneAndUpdate(
-			{},
-			{ mailbox }, // Directly using the mailbox value instead of wrapping it in an object
-			{ new: true, upsert: true }, // Create a new document if it doesn't exist
-		);
+		const result = await Maintenance.findOneAndUpdate({}, updateFields, {
+			new: true,
+			upsert: true,
+		});
 
-		return res.status(200).json({
+		res.status(200).json({
 			result,
-			message: "Mailbox updated successfully",
+			message: "Mailbox settings updated successfully",
 		});
 	} catch (err) {
-		console.error("Error updating mailbox:", err); // Log the full error object for easier debugging
-		return res.status(500).json({
+		console.error("Error updating mailbox:", err);
+		res.status(500).json({
 			message: "Failed to update mailbox",
 			error: err.message,
 		});

@@ -17,7 +17,7 @@ exports.createAccount = async (req, res) => {
 	const body = req.body;
 	const { id, email } = req.user;
 
-	console.log(body, id, email);
+	// console.log(body, id, email);
 
 	try {
 		if (!body.key && !body.cookie) {
@@ -37,14 +37,7 @@ exports.createAccount = async (req, res) => {
 
 		dataCache.del("accounts");
 		dataCache.del("everything");
-		// updateUserDailyStats(
-		// 	{
-		// 		accountType: body.accountType,
-		// 		accountFormat: body.accountFormat,
-		// 		rate: body.rate,
-		// 	},
-		// 	id,
-		// );
+
 		res
 			.status(201)
 			.json({ success: true, message: "Account created successfully" });
@@ -67,55 +60,64 @@ exports.everyThings = async (req, res) => {
 				message: "User ID or email is missing from the request.",
 			});
 		}
+		const accounts = await Account.find({ userID: id });
+
+		const norApproved = accounts.filter(
+			account => !account.approved && !account.die && !account.resolved,
+		);
+		const approved = accounts.filter(account => account.approved);
+		const withdraw = await Withdraw.find({ userID: id });
 
 		// Retrieve accounts and approved accounts in a single query
-		const [accounts, approved, withdraw, allAccounts] = await Promise.all([
-			Account.find({
-				userID: id,
-				$nor: [{ approved: true }, { die: true }, { resolved: true }],
-			}),
-			Account.find({
-				userID: id,
-				approved: true,
-			}),
-			Withdraw.find({ userID: id }),
-			Account.find({ userID: id }),
-		]);
+		// const [accounts, approved, withdraw, allAccounts] = await Promise.all([
+		// 	Account.find({
+		// 		userID: id,
+		// 		$nor: [{ approved: true }, { die: true }, { resolved: true }],
+		// 	}),
+		// 	Account.find({
+		// 		userID: id,
+		// 		approved: true,
+		// 	}),
+		// 	Account.find({ userID: id }),
+		// 	Withdraw.find({ userID: id }),
+		// ]);
+
+		// console.log({
+		// 	accounts: accounts.length,
+		// 	norApproved: norApproved.length,
+		// 	approved: approved.length,
+		// withdraw: withdraw.length,
+		// });
+		// console.log({
+		// 	accounts: accounts.length,
+		// 	norApproved: norApproved.length,
+		// 	approved: approved.length,
+		// 	withdraw: withdraw.length,
+		// });
 
 		// Generate summary for account rates by accountType
-		const summary = accounts.reduce((acc, { accountType, rate }) => {
+		const summary = norApproved.reduce((acc, { accountType, rate }) => {
 			acc[accountType] = acc[accountType] || { accountType, totalRate: 0 };
 			acc[accountType].totalRate += rate;
 			return acc;
 		}, {});
 
-		// // Fetch user stats from cache or database
-		// let userStats = dataCache.get("everything");
-		// if (userStats) {
-		// 	userStats = JSON.parse(userStats);
-		// } else {
-		// 	userStats = await getUserStats(id);
-		// 	if (userStats) {
-		// 		dataCache.set("everything", JSON.stringify(userStats)); // Cache the stats
-		// 	}
-		// }
-
-		// Handle missing user stats
-		// if (!userStats) {
-		// 	return res.status(404).json({
-		// 		success: false,
-		// 		message: "User stats not found.",
-		// 	});
-		// }
+		// console.log({
+		// 	accounts,
+		// 	approved,
+		// 	withdraw,
+		// 	allAccounts,
+		// 	summary,
+		// });
 
 		// Respond with the combined data
 		res.status(200).json({
 			success: true,
-			accounts,
+			accounts: norApproved,
 			summary,
 			approved,
 			withdraw,
-			allAccounts,
+			allAccounts: accounts,
 		});
 	} catch (err) {
 		// Log and respond to errors

@@ -8,6 +8,8 @@ const MaintenanceSchema = new mongoose.Schema(
 		mailbox: { type: String },
 		tempmail: { type: Boolean },
 		mailboxToggle: { type: Boolean },
+		embedMailToggle: { type: Boolean },
+		embedmail: { type: String },
 	},
 	{ timestamps: true },
 );
