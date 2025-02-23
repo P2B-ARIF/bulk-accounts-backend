@@ -31,6 +31,9 @@ exports.createWithdraw = async (req, res) => {
 			userID: id,
 			userEmail: email,
 			totalAccounts: accounts.length,
+			profit:
+				accounts.reduce((total, account) => total + account.sold, 0) -
+				newData.amount,
 		});
 		await payment.save();
 

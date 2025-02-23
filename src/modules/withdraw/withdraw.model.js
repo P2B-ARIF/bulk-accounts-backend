@@ -12,6 +12,7 @@ const withdrawSchema = new mongoose.Schema({
 	},
 	accountName: { type: String, required: [true, "Account Name is required"] },
 	amount: { type: Number, required: [true, "Amount is required"] },
+	profit: { type: Number, required: [true, "Profit is required"] },
 	notes: { type: String },
 
 	payment: { type: String, enum: ["pending", "success"], default: "pending" },

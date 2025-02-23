@@ -254,7 +254,7 @@ exports.approvedAccounts = async (req, res) => {
 
 exports.actionAccounts = async (req, res) => {
 	try {
-		const { action } = req.query;
+		const { action, rate } = req.query;
 		const accountUIDs = req.body;
 
 		if (!Array.isArray(accountUIDs) || accountUIDs.length === 0) {
@@ -265,10 +265,14 @@ exports.actionAccounts = async (req, res) => {
 
 		let result;
 
-		if (action === "approved") {
+		console.log(action, rate);
+
+		if (action === "approved" && rate) {
 			result = await Account.updateMany(
 				{ uid: { $in: accountUIDs } },
-				{ $set: { approved: true } }, // Set `approved` to true
+				{ $set: { approved: true, sold: Number(rate) } },
+				{ new: true },
+				// Set `approved` to true
 			);
 		}
 		if (action === "attempt") {

@@ -23,6 +23,7 @@ const AccountSchema = new mongoose.Schema({
 
 	// account status
 	approved: { type: Boolean },
+	sold: { type: Number, default: 0 },
 	downloaded: { type: Boolean },
 	correction: { type: Boolean },
 	resolved: { type: Boolean },
