@@ -4,8 +4,8 @@ const mongoose = require("mongoose");
 const AccountSchema = new mongoose.Schema({
 	uid: { type: String, required: [true, "UID is required"], trim: true },
 	password: { type: String, required: [true, "Password is required"] },
-	email: { type: String, required: [true, "Email is required"] },
-	key: { type: String },
+	email: { type: String, required: [true, "Email is required"], trim: true },
+	key: { type: String, trim: true },
 	cookie: { type: String },
 
 	// account information
